@@ -8,7 +8,7 @@
 #SBATCH --error="DOGO_ERROR-%j.e"
 #SBATCH --mail-user=deolj19@wfu.edu
 #SBATCH --mail-type=FAIL
-#SBATCH --account=ballardGrp
+#SBATCH --account=csc373
 #SBATCH --partition=small
 
 # Load a software module
