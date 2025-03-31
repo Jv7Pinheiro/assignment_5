@@ -1,0 +1,26 @@
+Quality of dataset with 7793069 records BEFORE cleaning
+
+Found 0 duplicated rows
+Found 7783450 rows with missing values
+Found 6 columns with missing values
+Rows dropped due to missing required features: 44492
+
+Features description BEFORE cleaning:
+
+                 count  min      max    dtype
+hours        7766532.0  0.0  42100.7  float64
+products     7778108.0  1.0  18188.0  float64
+page_order   7793069.0  0.0      9.0    int64
+page         7793069.0  1.0  18371.0    int64
+found_funny  1200756.0  1.0  13318.0  float64
+
+Quality of dataset with 7748577 records AFTER cleaning
+
+Features description AFTER cleaning:
+
+                 count  min      max    dtype
+hours        7748577.0  0.0  42100.7  float64
+products     7733676.0  1.0  18188.0  float64
+page_order   7748577.0  0.0      9.0    int64
+page         7748577.0  1.0  18371.0    int64
+found_funny  1192565.0  1.0  13318.0  float64

@@ -23,19 +23,9 @@ def discretize_data(data, n=2, bool=True, scale=0.0):
     
     return labels
     
-def clean_data(data_path: str, required_features: list[str], slice: int = -1) -> pd.DataFrame:
-    dataset = []
-
-    with gzip.open(data_path, 'rt', encoding='utf-8') as input_file:
-        if slice == -1:
-            slice = len(input_file)
-
-        for i, line in enumerate(input_file):
-            if i >= slice:
-                break
-            d = eval(line)
-            dataset.append(d)
-    df = pd.DataFrame(dataset)
+def clean_data(dataset: list, required_features: list[str], slice_size: int = -1) -> pd.DataFrame:
+    # Whole dataset or a slice of it
+    df = pd.DataFrame(dataset[:slice_size] if slice_size > 0 else dataset)
 
     print(f"Data before cleaning: {df.shape[0]} rows.")
 
@@ -47,23 +37,17 @@ def clean_data(data_path: str, required_features: list[str], slice: int = -1) ->
     missing_value_cols = df.columns[data_null.any()]
     missing_value_rows = df[data_null.any(axis=1)]
 
+    # Check for missing values in required features
     missing_cols = [col for col in required_features if col not in df.columns]
-    existing_required_features = [col for col in required_features if col in df.columns]
 
     num_rows_due_to_missing_cols = 0
-    if missing_cols:
-        pass
 
-    if existing_required_features:
-        rows_missing_req_features = df[df[existing_required_features].isnull().any(axis=1)]
-        num_rows_missing_req_features = len(rows_missing_req_features)
-        df = df.drop(rows_missing_req_features.index)
-    else:
-        num_rows_missing_req_features = len(df)
-        df = df.iloc[0:0]
+    rows_missing_req_features = df[df[required_features].isnull().any(axis=1)]
+    num_rows_missing_req_features = len(rows_missing_req_features)
+    df = df.drop(rows_missing_req_features.index)
 
-    df = df.drop_duplicates()
-    df = df.dropna()
+    # df = df.drop_duplicates()
+    # df = df.dropna()
 
     print(f"Data after cleaning: {df.shape[0]} rows.")
 
@@ -97,10 +81,3 @@ def clean_data(data_path: str, required_features: list[str], slice: int = -1) ->
         f.write('\n')
 
     return df
-
-if __name__ == "__main__":
-    cleaned_df = clean_data(
-        "/deac/csc/classes/csc373/data/assignment_5/steam_reviews.json.gz",
-        required_features=["hours", "early_access", "text"],
-        slice=1000
-    )
