@@ -4,6 +4,7 @@ import gzip
 import time
 import pickle
 import numpy as np
+import pandas as pd
 
 from sklearn.pipeline import Pipeline # type: ignore
 from sklearn.naive_bayes import MultinomialNB # type: ignore
@@ -12,6 +13,8 @@ from sklearn.preprocessing import KBinsDiscretizer # type: ignore
 from sklearn.linear_model import LinearRegression # type: ignore
 from sklearn.metrics import accuracy_score # type: ignore
 from sklearn.metrics import mean_squared_error # type: ignore
+from sklearn.compose import ColumnTransformer # type: ignore
+from sklearn.preprocessing import FunctionTransformer, StandardScaler # type: ignore
 
 import utils
 warnings.filterwarnings("ignore")
@@ -23,16 +26,14 @@ LOG_TRANSFORM = True
 def log_transform(labels) -> np.ndarray:
     return np.log2(labels + 1)
     
+def compute_text_length(text_list: pd.Series):
+    return text_list.apply(len).values.reshape(-1, 1)
 
 def main():
     unzip_time_start = time.time()
     input_file = gzip.open("/deac/csc/classes/csc373/data/assignment_5/steam_reviews.json.gz")
     unzip_time_end = time.time()
     print(f"\nUnzipping time: {unzip_time_end - unzip_time_start:.6f} seconds\n")
-    # DEBUGGING Print size of input file 
-    # input_file.seek(0, 2)
-    # print(f"Input file size: {input_file.tell()} bytes\n")
-    # input_file.seek(0)
 
     appending_time_start = time.time()
     dataset = []
@@ -44,16 +45,12 @@ def main():
     input_file.close()
     appending_time_end = time.time()
     print(f"Appending time: {appending_time_end - appending_time_start:.6f} seconds\n")
-    # DEBUGGING Print size of dataset in bytes
-    # print(f"Dataset size: {sum(len(pickle.dumps(d)) for d in dataset)} bytes\n")
 
     cleaning_time_start = time.time()
     data = utils.clean_data(dataset, required_features=["hours", "early_access", "text"])
     cleaning_time_end = time.time()
     print(f"\Cleaning time: {cleaning_time_end - cleaning_time_start:.6f} seconds\n")
-
-
-    # code to split the data
+    
     splitting_time_start = time.time()
     split_index = int(len(data) * 0.8)
     train_data = data[:split_index]
@@ -61,12 +58,7 @@ def main():
     splitting_time_end = time.time()
 
     print(f"Splitting time: {splitting_time_end - splitting_time_start:.6f} seconds\n")
-    # DEBUGGING Print sizes of train_data and dev_data in bytes
-    # print(f"Train data size: {sum(len(pickle.dumps(d)) for d in train_data)} bytes")
-    # print(f"Dev data size: {sum(len(pickle.dumps(d)) for d in dev_data)} bytes\n")
 
-    # TODO: This should be a function inside utils that takes in data and a string that
-    # corresponds to a json feature and it returns a vector of just the features of data
 
     nb_train_texts = train_data['text'].tolist()
     nb_train_hours = train_data['hours'].values.reshape(-1, 1)
@@ -76,19 +68,13 @@ def main():
     nb_train_hours_binned = discretizer.fit_transform(nb_train_hours).ravel().astype(int)
     train_discretizer_time_end = time.time()
     print(f"Train labels discretizer transform time for {NUMBER_OF_BINS} bins: {train_discretizer_time_end - train_discretizer_time_start:.6f} seconds\n")
-    
-    # nb_train_hours_binned = np.digitize(train_hours, [2, 4, 10, 50, 100, 500, 1000], right=False)
 
-    #############################
-    ## Multinomial Naive Bayes ##
-    #############################
+    ##################################################################
+    ## Multinomial Naive Bayes (Feature engineering for regression) ##
+    ##################################################################
     # Make prediction based on Multinomial Naive Bayes
     NB_pipeline = Pipeline([
         ('vectorizer', TfidfVectorizer(
-            # There are more options for this
-            # relevant ones are max_df, min_df, and max_features
-            # for documentation read:
-            # https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
             strip_accents='ascii', 
             lowercase=True, 
             analyzer='word', 
@@ -109,7 +95,6 @@ def main():
     nb_dev_hours_binned = discretizer.transform(nb_dev_hours).ravel().astype(int)
     dev_discretizer_time_end = time.time()
     print(f"Dev labels discretizer transform time: {dev_discretizer_time_end - dev_discretizer_time_start:.6f} seconds\n")
-    # y_dev_hours_binned = np.digitize(dev_hours, [2, 4, 10, 50, 100, 500, 1000], right=False)
 
     train_data_predict_time_start = time.time()
     nb_train_pred = NB_pipeline.predict(nb_train_texts)
@@ -128,14 +113,10 @@ def main():
     dev_accuracy = accuracy_score(nb_dev_hours_binned, nb_dev_pred)
     print(f"Accuracy on dev set: {100*dev_accuracy:.1f}%")
 
-    #############################
+    ################
     ## Estimation ##
-    #############################
+    ################
 
-    train_data["text_length"] = train_data["text"].astype(str).apply(len)
-    dev_data["text_length"] = dev_data["text"].astype(str).apply(len)
-
-    est_X_train = train_data[["nb_pred", "text_length", "early_access"]]
     est_y_train  = train_data['hours'].values.reshape(-1, 1)
     est_y_dev = dev_data['hours'].values.reshape(-1, 1)
 
@@ -143,7 +124,7 @@ def main():
         remove_outliers_time_start = time.time()
         threshold = np.percentile(est_y_train, 90)
         keep_mask = (est_y_train <= threshold)
-        est_X_train = est_X_train[keep_mask]
+        train_data = train_data[keep_mask]
         est_y_train = est_y_train[keep_mask]
         remove_outliers_time_end = time.time()
         print(f"Outlier removal time: {remove_outliers_time_end - remove_outliers_time_start:.6f} seconds\n")
@@ -155,17 +136,26 @@ def main():
         print(f"Log transform time: {log_transform_time_end - log_transform_time_start:.6f} seconds\n")
 
     est_pipeline = Pipeline([
+        ('features', ColumnTransformer(
+            transformers=[
+                ('text_length', Pipeline([
+                    ('compute_length', FunctionTransformer(compute_text_length, validate=False)),
+                    ('scaler', StandardScaler())
+                ]), 'text'),
+                ('passthrough', 'passthrough', ['nb_pred', 'early_access'])
+            ]
+        )),
         ('regressor', LinearRegression()),
     ])
 
     print("\nPerforming Linear Regression on the ['nb_pred', 'text_length', 'early_access'] features")
     REG_time_start = time.time()
-    est_pipeline.fit(est_X_train, est_y_train)
+    est_pipeline.fit(train_data, est_y_train)
     REG_time_end = time.time()
     print(f"Linear Reg training time: {REG_time_end - REG_time_start:.6f} seconds\n")
 
     REG_predict_time_start = time.time()
-    est_dev_pred = est_pipeline.predict(dev_data[["nb_pred", "text_length", "early_access"]])
+    est_dev_pred = est_pipeline.predict(dev_data)
     REG_predict_time_end = time.time()
     print(f"Linear Reg predict time: {REG_predict_time_end - REG_predict_time_start:.6f} seconds\n")
 

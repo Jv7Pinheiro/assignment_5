@@ -4,24 +4,6 @@ import gzip
 import os
 
 OUTPUT_PATH = "../output/output.txt"
-
-def discretize_data(data, n=2, bool=True, scale=0.0):
-    # If scale is not zero, then we want to scale the data by scale
-    # If scale is less than zero, ignore it
-    if (scale > 0.0):
-        data *= scale
-    
-
-    # Sort data and determine thresholds
-    sorted_indices = np.argsort(data)
-    thresholds = np.linspace(0, len(data), n+1, dtype=float)
-    
-    # Create labels based on partition
-    labels = np.zeros(len(data), dtype=float)
-    for i in range(n):
-        labels[sorted_indices[thresholds[i]:thresholds[i+1]]] = i
-    
-    return labels
     
 def clean_data(dataset: list, required_features: list[str], slice_size: int = -1) -> pd.DataFrame:
     # Whole dataset or a slice of it
@@ -30,6 +12,7 @@ def clean_data(dataset: list, required_features: list[str], slice_size: int = -1
     print(f"Data before cleaning: {df.shape[0]} rows.")
 
     duplicated_rows = df[df.duplicated(keep=False)]
+    duplicated_user_entries = df[df.duplicated(subset=['username'])]
 
     df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x).replace('', np.nan)
 
@@ -59,6 +42,7 @@ def clean_data(dataset: list, required_features: list[str], slice_size: int = -1
     with open(OUTPUT_PATH, 'w') as f:
         f.write(f"Quality of dataset with {len(dataset)} records BEFORE cleaning\n\n")
         f.write(f"Found {len(duplicated_rows)} duplicated rows\n")
+        f.write(f"Found {len(duplicated_user_entries)} duplicated user entries\n")
         f.write(f"Found {len(missing_value_rows)} rows with missing values\n")
         f.write(f"Found {len(missing_value_cols)} columns with missing values\n")
 
