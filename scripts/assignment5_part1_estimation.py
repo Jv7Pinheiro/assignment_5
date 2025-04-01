@@ -16,6 +16,8 @@ import utils
 
 warnings.filterwarnings("ignore")
 
+NUMBER_OF_BINS = 100
+
 def main():
     unzip_time_start = time.time()
     input_file = gzip.open("/deac/csc/classes/csc373/data/assignment_5/steam_reviews.json.gz")
@@ -63,10 +65,10 @@ def main():
     train_texts = train_data['text'].tolist()
     train_hours = train_data['hours'].values.reshape(-1, 1)
 
-    # discretizer = KBinsDiscretizer(n_bins=20, encode='ordinal', strategy='quantile')
-    # y_hours_binned = discretizer.fit_transform(train_hours).ravel().astype(int)
+    discretizer = KBinsDiscretizer(n_bins=NUMBER_OF_BINS, encode='ordinal', strategy='quantile')
+    y_hours_binned = discretizer.fit_transform(train_hours).ravel().astype(int)
     
-    y_hours_binned = np.digitize(train_hours, [2, 4, 10, 50, 100, 500, 1000], right=False)
+    # y_hours_binned = np.digitize(train_hours, [2, 4, 10, 50, 100, 500, 1000], right=False)
 
     #############################
     ## Multinomial Naive Bayes ##
@@ -94,8 +96,8 @@ def main():
     dev_texts = dev_data['text'].tolist()
     dev_hours = dev_data['hours'].values.reshape(-1, 1)
     
-    # y_dev_hours_binned = discretizer.transform(dev_hours).ravel().astype(int)
-    y_dev_hours_binned = np.digitize(dev_hours, [2, 4, 10, 50, 100, 500, 1000], right=False)
+    y_dev_hours_binned = discretizer.transform(dev_hours).ravel().astype(int)
+    # y_dev_hours_binned = np.digitize(dev_hours, [2, 4, 10, 50, 100, 500, 1000], right=False)
     y_pred = NB_pipeline.predict(dev_texts)
     # 4) Evaluate accuracy
     dev_accuracy = accuracy_score(y_dev_hours_binned, y_pred)

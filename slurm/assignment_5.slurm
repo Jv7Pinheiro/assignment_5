@@ -2,7 +2,7 @@
 #SBATCH --job-name="PART1"
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem=32GB
+#SBATCH --mem=128GB
 #SBATCH --time=00-02:00:00
 #SBATCH --output="./DOGO_FR-%j.o"
 #SBATCH --error="./DOGO_ERROR-%j.e"
