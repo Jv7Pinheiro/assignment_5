@@ -1,0 +1,50 @@
+#########################BEGIN-PROLOG#########################
+JobName   = PART1
+Account   = csc373
+NodeList  = cpu-intel-65
+Resources = cpu=1,mem=128G,node=1,billing=10
+WorkDir   = /deac/csc/classes/csc373/gonza224/assignment_5/slurm
+###########################END-PROLOG#########################
+
+Unzipping time: 0.002114 seconds
+
+Appending time: 429.138227 seconds
+
+Data before cleaning: 7793069 rows.
+Data after cleaning: 7748577 rows.
+\Cleaning time: 97.952892 seconds
+
+Splitting time: 0.000178 seconds
+
+Train labels discretizer transform time for 4 bins: 0.337365 seconds
+
+
+Performing Multinomial Naive Bayes on the reviews
+NB training time: 247.820121 seconds
+
+Dev labels discretizer transform time: 0.032056 seconds
+
+Train data NB predict time (this will be plugged in regressor training): 243.271562 seconds
+
+Dev data NB predict time (this will be plugged in regressor predict): 56.822238 seconds
+
+Accuracy on dev set: 39.5%
+Outlier removal time: 0.355479 seconds
+
+Log transform time: 0.033592 seconds
+
+
+Performing Linear Regression on the ['nb_pred', 'text_length', 'early_access'] features
+Linear Reg training time: 0.536216 seconds
+
+Linear Reg predict time: 0.060957 seconds
+
+Log transform time on prediction: 0.018980 seconds
+
+RMSE on dev set: 12.38
+
+Underpredictions: 99004
+
+Overpredictions:  1450712
+
+

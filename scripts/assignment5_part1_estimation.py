@@ -8,15 +8,21 @@ import numpy as np
 from sklearn.pipeline import Pipeline # type: ignore
 from sklearn.naive_bayes import MultinomialNB # type: ignore
 from sklearn.feature_extraction.text import TfidfVectorizer # type: ignore
-from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import KBinsDiscretizer # type: ignore
+from sklearn.linear_model import LinearRegression # type: ignore
+from sklearn.metrics import accuracy_score # type: ignore
+from sklearn.metrics import mean_squared_error # type: ignore
 
-import utils # type: ignore
 import utils
-
 warnings.filterwarnings("ignore")
 
-NUMBER_OF_BINS = 100
+NUMBER_OF_BINS = 2
+REMOVE_OUTLIERS = True
+LOG_TRANSFORM = True
+
+def log_transform(labels) -> np.ndarray:
+    return np.log2(labels + 1)
+    
 
 def main():
     unzip_time_start = time.time()
@@ -62,13 +68,16 @@ def main():
     # TODO: This should be a function inside utils that takes in data and a string that
     # corresponds to a json feature and it returns a vector of just the features of data
 
-    train_texts = train_data['text'].tolist()
-    train_hours = train_data['hours'].values.reshape(-1, 1)
+    nb_train_texts = train_data['text'].tolist()
+    nb_train_hours = train_data['hours'].values.reshape(-1, 1)
 
+    train_discretizer_time_start = time.time()
     discretizer = KBinsDiscretizer(n_bins=NUMBER_OF_BINS, encode='ordinal', strategy='quantile')
-    y_hours_binned = discretizer.fit_transform(train_hours).ravel().astype(int)
+    nb_train_hours_binned = discretizer.fit_transform(nb_train_hours).ravel().astype(int)
+    train_discretizer_time_end = time.time()
+    print(f"Train labels discretizer transform time for {NUMBER_OF_BINS} bins: {train_discretizer_time_end - train_discretizer_time_start:.6f} seconds\n")
     
-    # y_hours_binned = np.digitize(train_hours, [2, 4, 10, 50, 100, 500, 1000], right=False)
+    # nb_train_hours_binned = np.digitize(train_hours, [2, 4, 10, 50, 100, 500, 1000], right=False)
 
     #############################
     ## Multinomial Naive Bayes ##
@@ -89,21 +98,93 @@ def main():
 
     print('\nPerforming Multinomial Naive Bayes on the reviews')
     NB_time_start = time.time()
-    NB_pipeline.fit(train_texts, y_hours_binned)
+    NB_pipeline.fit(nb_train_texts, nb_train_hours_binned)
     NB_time_end = time.time()
-    print(f"Training time: {NB_time_end - NB_time_start:.6f} seconds\n")
+    print(f"NB training time: {NB_time_end - NB_time_start:.6f} seconds\n")
 
-    dev_texts = dev_data['text'].tolist()
-    dev_hours = dev_data['hours'].values.reshape(-1, 1)
+    nb_dev_texts = dev_data['text'].tolist()
+    nb_dev_hours = dev_data['hours'].values.reshape(-1, 1)
     
-    y_dev_hours_binned = discretizer.transform(dev_hours).ravel().astype(int)
+    dev_discretizer_time_start = time.time()
+    nb_dev_hours_binned = discretizer.transform(nb_dev_hours).ravel().astype(int)
+    dev_discretizer_time_end = time.time()
+    print(f"Dev labels discretizer transform time: {dev_discretizer_time_end - dev_discretizer_time_start:.6f} seconds\n")
     # y_dev_hours_binned = np.digitize(dev_hours, [2, 4, 10, 50, 100, 500, 1000], right=False)
-    y_pred = NB_pipeline.predict(dev_texts)
-    # 4) Evaluate accuracy
-    dev_accuracy = accuracy_score(y_dev_hours_binned, y_pred)
+
+    train_data_predict_time_start = time.time()
+    nb_train_pred = NB_pipeline.predict(nb_train_texts)
+    train_data["nb_pred"] = nb_train_pred
+    train_data_predict_time_end = time.time()
+    print(f"Train data NB predict time (this will be plugged in regressor training): "+
+          f"{train_data_predict_time_end - train_data_predict_time_start:.6f} seconds\n")
+
+    dev_data_predict_time_start = time.time()
+    nb_dev_pred = NB_pipeline.predict(nb_dev_texts)
+    dev_data["nb_pred"] = nb_dev_pred
+    dev_data_predict_time_end = time.time()
+    print(f"Dev data NB predict time (this will be plugged in regressor predict): "+
+          f"{dev_data_predict_time_end - dev_data_predict_time_start:.6f} seconds\n")
+
+    dev_accuracy = accuracy_score(nb_dev_hours_binned, nb_dev_pred)
     print(f"Accuracy on dev set: {100*dev_accuracy:.1f}%")
 
+    #############################
+    ## Estimation ##
+    #############################
 
+    train_data["text_length"] = train_data["text"].astype(str).apply(len)
+    dev_data["text_length"] = dev_data["text"].astype(str).apply(len)
+
+    est_X_train = train_data[["nb_pred", "text_length", "early_access"]]
+    est_y_train  = train_data['hours'].values.reshape(-1, 1)
+    est_y_dev = dev_data['hours'].values.reshape(-1, 1)
+
+    if REMOVE_OUTLIERS:
+        remove_outliers_time_start = time.time()
+        threshold = np.percentile(est_y_train, 90)
+        keep_mask = (est_y_train <= threshold)
+        est_X_train = est_X_train[keep_mask]
+        est_y_train = est_y_train[keep_mask]
+        remove_outliers_time_end = time.time()
+        print(f"Outlier removal time: {remove_outliers_time_end - remove_outliers_time_start:.6f} seconds\n")
+
+    if LOG_TRANSFORM:
+        log_transform_time_start = time.time()
+        est_y_train = log_transform(est_y_train)
+        log_transform_time_end = time.time()
+        print(f"Log transform time: {log_transform_time_end - log_transform_time_start:.6f} seconds\n")
+
+    est_pipeline = Pipeline([
+        ('regressor', LinearRegression()),
+    ])
+
+    print("\nPerforming Linear Regression on the ['nb_pred', 'text_length', 'early_access'] features")
+    REG_time_start = time.time()
+    est_pipeline.fit(est_X_train, est_y_train)
+    REG_time_end = time.time()
+    print(f"Linear Reg training time: {REG_time_end - REG_time_start:.6f} seconds\n")
+
+    REG_predict_time_start = time.time()
+    est_dev_pred = est_pipeline.predict(dev_data[["nb_pred", "text_length", "early_access"]])
+    REG_predict_time_end = time.time()
+    print(f"Linear Reg predict time: {REG_predict_time_end - REG_predict_time_start:.6f} seconds\n")
+
+    if LOG_TRANSFORM:
+        log_transform_pred_time_start = time.time()
+        est_dev_pred = np.power(2, np.maximum(est_dev_pred, 0)) - 1
+        est_y_dev = log_transform(est_y_dev).ravel()
+        log_transform_pred_time_end = time.time()
+        print(f"Log transform time on prediction: {log_transform_pred_time_end - log_transform_pred_time_start:.6f} seconds\n")
+
+    dev_mse = mean_squared_error(est_y_dev, est_dev_pred) 
+    dev_rmse = np.sqrt(dev_mse)
+
+    underpred = np.sum(est_dev_pred < est_y_dev)
+    overpred = np.sum(est_dev_pred > est_y_dev)
+
+    print(f"RMSE on dev set: {dev_rmse:.2f}\n")
+    print(f"Underpredictions: {underpred}\n")
+    print(f"Overpredictions:  {overpred}\n\n")
 
 
 if __name__ == "__main__":
