@@ -20,6 +20,7 @@ warnings.filterwarnings("ignore")
 sys.stdout.reconfigure(line_buffering=True)
 
 NUMBER_OF_BINS = 2
+REMOVE_OUTLIERS = True
 
 def compute_text_length(X):
     return np.array([len(text) for text in X]).reshape(-1, 1)
@@ -60,6 +61,14 @@ def complete_classifier():
 
     dev_texts = dev_data['text'].tolist()
     dev_hours = dev_data['hours'].values.reshape(-1, 1)
+
+    if REMOVE_OUTLIERS:
+        # Remove data outside the 80% percentile
+        threshold = np.percentile(train_hours, 80)
+
+        keep_mask = (train_hours <= threshold)
+        train_data = train_data[keep_mask]
+        train_hours = train_hours[keep_mask]
 
 
     # Discretize the hours into quartiles (bins) of both training and dev datasets
@@ -144,73 +153,73 @@ def complete_classifier():
 
 
 
-    ## Classifier Number 2 - Random Forest Classifier ##
-    print('\nPerforming Random Forest on the reviews')
+    # ## Classifier Number 2 - Random Forest Classifier ##
+    # print('\nPerforming Random Forest on the reviews')
 
-    # Create RF pipeline
-    RF_pipeline = Pipeline([
-        ('features', feature_transformer),
-        ('classifier', RandomForestClassifier(n_estimators=10, random_state=42))  # Change to desired classifier
-    ])
+    # # Create RF pipeline
+    # RF_pipeline = Pipeline([
+    #     ('features', feature_transformer),
+    #     ('classifier', RandomForestClassifier(n_estimators=10, random_state=42))  # Change to desired classifier
+    # ])
 
-    # Train Classifier
-    RF_time_start = time.time()
-    RF_pipeline.fit(train_data, train_hours_binned)
-    RF_time_end = time.time()
-    print(f"\tRF train time: {RF_time_end - RF_time_start:.6f} seconds")
+    # # Train Classifier
+    # RF_time_start = time.time()
+    # RF_pipeline.fit(train_data, train_hours_binned)
+    # RF_time_end = time.time()
+    # print(f"\tRF train time: {RF_time_end - RF_time_start:.6f} seconds")
 
-    # Predict Developer Data
-    dev_data_predict_time_start = time.time()
-    rf_dev_preds = RF_pipeline.predict(dev_data)
-    dev_data_predict_time_end = time.time()
-    print(f"\tRF predict time: {dev_data_predict_time_end - dev_data_predict_time_start:.6f} seconds")
+    # # Predict Developer Data
+    # dev_data_predict_time_start = time.time()
+    # rf_dev_preds = RF_pipeline.predict(dev_data)
+    # dev_data_predict_time_end = time.time()
+    # print(f"\tRF predict time: {dev_data_predict_time_end - dev_data_predict_time_start:.6f} seconds")
 
-    # Under and Over predictions
-    underpred = np.sum(rf_dev_preds < dev_hours_binned)
-    overpred = np.sum(rf_dev_preds > dev_hours_binned)
-    print(f"\tUnderpredictions: {underpred} ({(underpred / len(dev_hours_binned))*100}%)")
-    print(f"\tOverpredictions:  {overpred} ({(overpred / len(dev_hours_binned))*100}%)")
+    # # Under and Over predictions
+    # underpred = np.sum(rf_dev_preds < dev_hours_binned)
+    # overpred = np.sum(rf_dev_preds > dev_hours_binned)
+    # print(f"\tUnderpredictions: {underpred} ({(underpred / len(dev_hours_binned))*100}%)")
+    # print(f"\tOverpredictions:  {overpred} ({(overpred / len(dev_hours_binned))*100}%)")
 
-    dev_accuracy = accuracy_score(dev_hours_binned, rf_dev_preds)
-    print(f"\tRF Accuracy: {100 * dev_accuracy:.1f}%")
+    # dev_accuracy = accuracy_score(dev_hours_binned, rf_dev_preds)
+    # print(f"\tRF Accuracy: {100 * dev_accuracy:.1f}%")
 
-    if dev_accuracy > best_accuracy:
-        save_pipeline =  RF_pipeline
-        best_model_name = "RandomForest"
+    # if dev_accuracy > best_accuracy:
+    #     save_pipeline =  RF_pipeline
+    #     best_model_name = "RandomForest"
 
 
 
-    ## Classifier Number 3 - Gradiant Boosting ##
-    print('\nPerforming Gradient Boosting on the reviews')
+    # ## Classifier Number 3 - Gradiant Boosting ##
+    # print('\nPerforming Gradient Boosting on the reviews')
 
-    # Create the GB pipeline
-    GB_pipeline = Pipeline([
-        ('features', feature_transformer),
-        ('classifier', GradientBoostingClassifier(n_estimators=10, learning_rate=0.1, random_state=42))
-    ])
+    # # Create the GB pipeline
+    # GB_pipeline = Pipeline([
+    #     ('features', feature_transformer),
+    #     ('classifier', GradientBoostingClassifier(n_estimators=10, learning_rate=0.5, random_state=42))
+    # ])
 
-    gbc_time_start = time.time()
-    GB_pipeline.fit(train_data, train_hours_binned)
-    gbc_time_end = time.time()
-    print(f"\tGBC train time: {gbc_time_end - gbc_time_start:.6f} seconds")
+    # gbc_time_start = time.time()
+    # GB_pipeline.fit(train_data, train_hours_binned)
+    # gbc_time_end = time.time()
+    # print(f"\tGBC train time: {gbc_time_end - gbc_time_start:.6f} seconds")
 
-    dev_data_predict_time_start = time.time()
-    gbc_dev_pred = GB_pipeline.predict(dev_data)
-    dev_data_predict_time_end = time.time()
-    print(f"\tGBC train time: {dev_data_predict_time_end - dev_data_predict_time_start:.6f} seconds")
+    # dev_data_predict_time_start = time.time()
+    # gbc_dev_pred = GB_pipeline.predict(dev_data)
+    # dev_data_predict_time_end = time.time()
+    # print(f"\tGBC train time: {dev_data_predict_time_end - dev_data_predict_time_start:.6f} seconds")
 
-    # Under and Over predictions
-    underpred = np.sum(gbc_dev_pred < dev_hours_binned)
-    overpred = np.sum(gbc_dev_pred > dev_hours_binned)
-    print(f"\tUnderpredictions: {underpred} ({(underpred / len(dev_hours_binned))*100}%)")
-    print(f"\tOverpredictions:  {overpred} ({(overpred / len(dev_hours_binned))*100}%)")
+    # # Under and Over predictions
+    # underpred = np.sum(gbc_dev_pred < dev_hours_binned)
+    # overpred = np.sum(gbc_dev_pred > dev_hours_binned)
+    # print(f"\tUnderpredictions: {underpred} ({(underpred / len(dev_hours_binned))*100}%)")
+    # print(f"\tOverpredictions:  {overpred} ({(overpred / len(dev_hours_binned))*100}%)")
 
-    dev_accuracy = accuracy_score(dev_hours_binned, gbc_dev_pred)
-    print(f"\tGBC Accuracy: {100 * dev_accuracy:.1f}%")
+    # dev_accuracy = accuracy_score(dev_hours_binned, gbc_dev_pred)
+    # print(f"\tGBC Accuracy: {100 * dev_accuracy:.1f}%")
 
-    if dev_accuracy > best_accuracy:
-        save_pipeline =  GB_pipeline
-        best_model_name = "GradientBoosting"
+    # if dev_accuracy > best_accuracy:
+    #     save_pipeline =  GB_pipeline
+    #     best_model_name = "GradientBoosting"
 
     joblib.dump(save_pipeline, f"../output/{best_model_name}_model.pkl")
 
