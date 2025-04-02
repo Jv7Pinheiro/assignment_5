@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH --job-name="PART3"
+#SBATCH --job-name="PART2"
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=32
 #SBATCH --mem=128GB
 #SBATCH --time=00-02:00:00
-#SBATCH --output="./Recommender_Spark-%j.o"
-#SBATCH --mail-user=gonza224@wfu.edu
+#SBATCH --output="./Classifier-Part2a-%j.o"
+#SBATCH --mail-user=deolj19@wfu.edu
 #SBATCH --mail-type=FAIL
 #SBATCH --account=csc373
 #SBATCH --partition=small
@@ -19,4 +19,4 @@ cd /deac/csc/classes/csc373/${USER}/assignment_5/scripts
 # Run the program
 # python assignment5_part1_estimation.py
 # python assignment5_part2_classification.py
-python assignment5_part3_recommendation.py
+python assignment5_part2_classification.py

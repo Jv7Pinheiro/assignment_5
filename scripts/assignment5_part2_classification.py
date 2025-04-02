@@ -19,6 +19,7 @@ warnings.filterwarnings("ignore")
 
 sys.stdout.reconfigure(line_buffering=True)
 
+CLEANED_DATA_PATH = '../data/steam_reviews_clean_data.json'
 NUMBER_OF_BINS = 2
 REMOVE_OUTLIERS = True
 
@@ -71,16 +72,17 @@ def complete_classifier():
         train_hours = train_hours[keep_mask]
 
 
+
     # Discretize the hours into quartiles (bins) of both training and dev datasets
     discretizer = KBinsDiscretizer(n_bins=NUMBER_OF_BINS, encode='ordinal', strategy='quantile')
 
     train_discretizer_time_start = time.time()
-    train_hours_binned = discretizer.fit_transform(train_hours).ravel().astype(int)
+    train_hours_binned = discretizer.fit_transform(train_hours.reshape(-1, 1)).ravel().astype(int)
     train_discretizer_time_end = time.time()
     print(f"Train labels discretizer transform time for {NUMBER_OF_BINS} bins: {train_discretizer_time_end - train_discretizer_time_start:.6f} seconds\n")
 
     dev_discretizer_time_start = time.time()
-    dev_hours_binned = discretizer.transform(dev_hours).ravel().astype(int)
+    dev_hours_binned = discretizer.transform(dev_hours.reshape(-1, 1)).ravel().astype(int)
     dev_discretizer_time_end = time.time()
     print(f"Dev labels discretizer transform time: {dev_discretizer_time_end - dev_discretizer_time_start:.6f} seconds\n")
 
