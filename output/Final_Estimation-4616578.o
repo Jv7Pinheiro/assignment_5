@@ -1,0 +1,33 @@
+#########################BEGIN-PROLOG#########################
+JobName   = PART1
+Account   = csc373
+NodeList  = cpu-intel-64
+Resources = cpu=1,mem=128G,node=1,billing=10
+WorkDir   = /deac/csc/classes/csc373/deolj19/assignment_5/output
+###########################END-PROLOG#########################
+Loading and Appending Data time: 423.792463 seconds
+
+Data before cleaning: 7793069 entries.
+Data after cleaning: 7748577 entries.
+Cleaning time: 101.085591 seconds
+
+Train labels discretizer transform time for 2 bins: 0.309768 seconds
+
+Dev labels discretizer transform time: 0.025155 seconds
+
+
+Performing Multinomial Naive Bayes on the reviews
+	NB train time: 245.480168 seconds
+	NB predict time (on training data): 240.279550 seconds
+	NB predict time (on developer data): 56.402770 seconds
+	NB Accuracy on dev set: 64.2%
+
+Performing Linear Regression on the ['nb_pred', 'text_length', 'early_access'] features
+	Linear Reg training time: 4.030573 seconds
+	Linear Reg predict time: 1.214725 seconds
+
+	Regressor MSE on dev dataset: 11.83
+	Underpredictions: 82614
+	Underprediction rate: 5.330912244566101%
+	Overpredictions:  1467102
+	Overprediction rate rate: 94.6690877554339%

@@ -1,9 +1,10 @@
 Quality of dataset with 7793069 records BEFORE cleaning
 
-Found 0 duplicated rows
-Found 7783450 rows with missing values
-Found 6 columns with missing values
-Rows dropped due to missing required features: 44492
+Found 0 duplicated entries
+Found 5225531 duplicated user entries
+Found 7783450 entries with missing values
+Found 6 categories with missing values
+entries dropped due to missing required features: 44492
 
 Features description BEFORE cleaning:
 

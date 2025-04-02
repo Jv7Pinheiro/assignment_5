@@ -1,11 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name="PART1"
+#SBATCH --job-name="PART2"
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem=128GB
 #SBATCH --time=00-02:00:00
-#SBATCH --output="./DOGO_FR-%j.o"
-#SBATCH --error="./DOGO_ERROR-%j.e"
+#SBATCH --output="./Classifier_NB-%j.o"
 #SBATCH --mail-user=gonza224@wfu.edu
 #SBATCH --mail-type=FAIL
 #SBATCH --account=csc373
@@ -18,6 +17,5 @@ module load /deac/csc/classes/csc373/software/modulefiles/csc373/python/3.11.8
 cd /deac/csc/classes/csc373/${USER}/assignment_5/scripts
 
 # Run the program
-# python ... ... ...
-# python assignment_3.py
-python assignment5_part1_estimation.py
+# python assignment5_part1_estimation.py
+python assignment5_part2_classification.py
