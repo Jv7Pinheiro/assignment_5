@@ -13,7 +13,8 @@ from pyspark.sql.functions import col, log, pow, greatest, lit, isnan # type: ig
 
 import utils
 warnings.filterwarnings("ignore")
-os.environ["PYSPARK_SUBMIT_ARGS"] = "--driver-memory 128g pyspark-shell"
+
+sys.stdout.reconfigure(line_buffering=True)
 
 LOG_TRANSFORM = True
 CLEANED_DATA_PATH = '../data/steam_reviews_clean_data.json'

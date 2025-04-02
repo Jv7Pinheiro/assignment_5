@@ -5,4 +5,3 @@ NodeList  = cpu-intel-64
 Resources = cpu=32,mem=128G,node=1,billing=32
 WorkDir   = /deac/csc/classes/csc373/gonza224/assignment_5/slurm
 ###########################END-PROLOG#########################
-slurmstepd: error: *** JOB 4622752 ON cpu-intel-64 CANCELLED AT 2025-04-02T14:40:52 ***
