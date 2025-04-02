@@ -10,6 +10,7 @@ from pyspark.ml.feature import StringIndexer, StringIndexerModel # type: ignore
 from pyspark.ml.recommendation import ALSModel, ALS # type: ignore
 from pyspark.ml.evaluation import RegressionEvaluator # type: ignore
 from pyspark.sql.functions import col, log, pow, greatest, lit, isnan # type: ignore
+from pyspark.ml.tuning import ParamGridBuilder, CrossValidator #type: ignore
 
 import utils
 warnings.filterwarnings("ignore")
@@ -112,7 +113,15 @@ def main():
 
     # Recommender training
     REC_train_time_start = time.time()
-    als_model = als.fit(train_spark_df)
+    paramGrid = (
+        ParamGridBuilder()
+        .addGrid(als.maxIter, [5, 10, 15])
+        .build()
+    )
+    evaluator = RegressionEvaluator(labelCol="hours", predictionCol="prediction", metricName="rmse")
+    cv = CrossValidator(estimator=als, estimatorParamMaps=paramGrid, evaluator=evaluator, numFolds=3)
+    cvModel = cv.fit(train_spark_df)
+    als_model = cvModel.bestModel
     REC_train_time_end = time.time()
     print(f"\tRecommender training time: {REC_train_time_end - REC_train_time_start:.6f} seconds")
 
@@ -138,7 +147,7 @@ def main():
     )
 
     total = predictions.count()
-    dev_rmse = evaluator.evaluate(predictions) 
+    dev_rmse = evaluator.evaluate(predictions)
     underpred = predictions.filter(predictions.prediction < predictions.hours).count()
     overpred = predictions.filter(predictions.prediction > predictions.hours).count()
 
@@ -157,6 +166,7 @@ def predict_real_data(new_data_path: str, output_path: str):
     spark = SparkSession.builder.appName("Real Data Prediction").getOrCreate()
 
     new_df = spark.read.json(new_data_path)
+    new_df = new_df.sample(fraction=0.05, seed=42)
 
     user_model = StringIndexerModel.load(USER_INDEXER_PATH)
     product_model = StringIndexerModel.load(PRODUCT_INDEXER_PATH)
@@ -176,3 +186,7 @@ def predict_real_data(new_data_path: str, output_path: str):
 
 if __name__ == "__main__":
     main()
+    # predict_real_data(
+    #     new_data_path="../data/steam_reviews_clean_data.json",
+    #     output_path="../output/part3/predictions.json"
+    # )
