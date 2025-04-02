@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name="PART2"
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --ntasks-per-node=32
 #SBATCH --mem=128GB
-#SBATCH --time=00-02:00:00
-#SBATCH --output="./Classifier_NB-%j.o"
-#SBATCH --mail-user=gonza224@wfu.edu
+#SBATCH --time=00-05:00:00
+#SBATCH --output="./Classifier-Part2a-%j.o"
+#SBATCH --mail-user=deolj19@wfu.edu
 #SBATCH --mail-type=FAIL
 #SBATCH --account=csc373
 #SBATCH --partition=small
