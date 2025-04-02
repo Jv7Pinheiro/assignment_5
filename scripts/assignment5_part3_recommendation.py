@@ -151,7 +151,7 @@ def main():
     underpred = predictions.filter(predictions.prediction < predictions.hours).count()
     overpred = predictions.filter(predictions.prediction > predictions.hours).count()
 
-    print(f"\RMSE on dev dataset: {dev_rmse:.2f}")
+    print(f"\tRMSE on dev dataset: {dev_rmse:.2f}")
     print(f"\tUnderpredictions: {underpred}")
     print(f"\tUnderprediction rate: {(underpred / total)*100}%")
     print(f"\tOverpredictions:  {overpred}")
