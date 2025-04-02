@@ -1,0 +1,7 @@
+#########################BEGIN-PROLOG#########################
+JobName   = PART3
+Account   = csc373
+NodeList  = cpu-intel-67
+Resources = cpu=32,mem=128G,node=1,billing=32
+WorkDir   = /deac/csc/classes/csc373/gonza224/assignment_5/slurm
+###########################END-PROLOG#########################
