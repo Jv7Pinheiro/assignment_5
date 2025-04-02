@@ -1,100 +1,0 @@
-#########################BEGIN-PROLOG#########################
-JobName   = PART3
-Account   = csc373
-NodeList  = cpu-intel-65
-Resources = cpu=32,mem=128G,node=1,billing=32
-WorkDir   = /deac/csc/classes/csc373/gonza224/assignment_5/slurm
-###########################END-PROLOG#########################
-Setting default log level to "WARN".
-To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
-25/04/02 13:56:05 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-
-[Stage 0:>                                                          (0 + 0) / 1]
-25/04/02 14:04:13 ERROR Inbox: An error happened while processing message in the inbox for LocalSchedulerBackendEndpoint
-java.lang.OutOfMemoryError
-	at java.base/java.io.ByteArrayOutputStream.hugeCapacity(ByteArrayOutputStream.java:125)
-	at java.base/java.io.ByteArrayOutputStream.grow(ByteArrayOutputStream.java:119)
-	at java.base/java.io.ByteArrayOutputStream.ensureCapacity(ByteArrayOutputStream.java:95)
-	at java.base/java.io.ByteArrayOutputStream.write(ByteArrayOutputStream.java:156)
-	at org.apache.spark.util.ByteBufferOutputStream.write(ByteBufferOutputStream.scala:41)
-	at java.base/java.io.ObjectOutputStream$BlockDataOutputStream.drain(ObjectOutputStream.java:1873)
-	at java.base/java.io.ObjectOutputStream$BlockDataOutputStream.setBlockDataMode(ObjectOutputStream.java:1782)
-	at java.base/java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:1180)
-	at java.base/java.io.ObjectOutputStream.writeObject(ObjectOutputStream.java:345)
-	at org.apache.spark.serializer.JavaSerializationStream.writeObject(JavaSerializer.scala:46)
-	at org.apache.spark.serializer.JavaSerializerInstance.serialize(JavaSerializer.scala:115)
-	at org.apache.spark.scheduler.TaskSetManager.prepareLaunchingTask(TaskSetManager.scala:530)
-	at org.apache.spark.scheduler.TaskSetManager.$anonfun$resourceOffer$2(TaskSetManager.scala:494)
-	at scala.Option.map(Option.scala:230)
-	at org.apache.spark.scheduler.TaskSetManager.resourceOffer(TaskSetManager.scala:470)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOfferSingleTaskSet$2(TaskSchedulerImpl.scala:414)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOfferSingleTaskSet$2$adapted(TaskSchedulerImpl.scala:409)
-	at scala.Option.foreach(Option.scala:407)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOfferSingleTaskSet$1(TaskSchedulerImpl.scala:409)
-	at scala.collection.immutable.Range.foreach$mVc$sp(Range.scala:158)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.resourceOfferSingleTaskSet(TaskSchedulerImpl.scala:399)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOffers$20(TaskSchedulerImpl.scala:606)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOffers$20$adapted(TaskSchedulerImpl.scala:601)
-	at scala.collection.IndexedSeqOptimized.foreach(IndexedSeqOptimized.scala:36)
-	at scala.collection.IndexedSeqOptimized.foreach$(IndexedSeqOptimized.scala:33)
-	at scala.collection.mutable.ArrayOps$ofRef.foreach(ArrayOps.scala:198)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOffers$16(TaskSchedulerImpl.scala:601)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOffers$16$adapted(TaskSchedulerImpl.scala:574)
-	at scala.collection.mutable.ResizableArray.foreach(ResizableArray.scala:62)
-	at scala.collection.mutable.ResizableArray.foreach$(ResizableArray.scala:55)
-	at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:49)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.resourceOffers(TaskSchedulerImpl.scala:574)
-	at org.apache.spark.scheduler.local.LocalEndpoint.reviveOffers(LocalSchedulerBackend.scala:91)
-	at org.apache.spark.scheduler.local.LocalEndpoint$$anonfun$receive$1.applyOrElse(LocalSchedulerBackend.scala:68)
-	at org.apache.spark.rpc.netty.Inbox.$anonfun$process$1(Inbox.scala:115)
-	at org.apache.spark.rpc.netty.Inbox.safelyCall(Inbox.scala:213)
-	at org.apache.spark.rpc.netty.Inbox.process(Inbox.scala:100)
-	at org.apache.spark.rpc.netty.MessageLoop.org$apache$spark$rpc$netty$MessageLoop$$receiveLoop(MessageLoop.scala:75)
-	at org.apache.spark.rpc.netty.MessageLoop$$anon$1.run(MessageLoop.scala:41)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
-	at java.base/java.lang.Thread.run(Thread.java:829)
-Exception in thread "dispatcher-event-loop-1" java.lang.OutOfMemoryError
-	at java.base/java.io.ByteArrayOutputStream.hugeCapacity(ByteArrayOutputStream.java:125)
-	at java.base/java.io.ByteArrayOutputStream.grow(ByteArrayOutputStream.java:119)
-	at java.base/java.io.ByteArrayOutputStream.ensureCapacity(ByteArrayOutputStream.java:95)
-	at java.base/java.io.ByteArrayOutputStream.write(ByteArrayOutputStream.java:156)
-	at org.apache.spark.util.ByteBufferOutputStream.write(ByteBufferOutputStream.scala:41)
-	at java.base/java.io.ObjectOutputStream$BlockDataOutputStream.drain(ObjectOutputStream.java:1873)
-	at java.base/java.io.ObjectOutputStream$BlockDataOutputStream.setBlockDataMode(ObjectOutputStream.java:1782)
-	at java.base/java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:1180)
-	at java.base/java.io.ObjectOutputStream.writeObject(ObjectOutputStream.java:345)
-	at org.apache.spark.serializer.JavaSerializationStream.writeObject(JavaSerializer.scala:46)
-	at org.apache.spark.serializer.JavaSerializerInstance.serialize(JavaSerializer.scala:115)
-	at org.apache.spark.scheduler.TaskSetManager.prepareLaunchingTask(TaskSetManager.scala:530)
-	at org.apache.spark.scheduler.TaskSetManager.$anonfun$resourceOffer$2(TaskSetManager.scala:494)
-	at scala.Option.map(Option.scala:230)
-	at org.apache.spark.scheduler.TaskSetManager.resourceOffer(TaskSetManager.scala:470)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOfferSingleTaskSet$2(TaskSchedulerImpl.scala:414)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOfferSingleTaskSet$2$adapted(TaskSchedulerImpl.scala:409)
-	at scala.Option.foreach(Option.scala:407)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOfferSingleTaskSet$1(TaskSchedulerImpl.scala:409)
-	at scala.collection.immutable.Range.foreach$mVc$sp(Range.scala:158)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.resourceOfferSingleTaskSet(TaskSchedulerImpl.scala:399)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOffers$20(TaskSchedulerImpl.scala:606)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOffers$20$adapted(TaskSchedulerImpl.scala:601)
-	at scala.collection.IndexedSeqOptimized.foreach(IndexedSeqOptimized.scala:36)
-	at scala.collection.IndexedSeqOptimized.foreach$(IndexedSeqOptimized.scala:33)
-	at scala.collection.mutable.ArrayOps$ofRef.foreach(ArrayOps.scala:198)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOffers$16(TaskSchedulerImpl.scala:601)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.$anonfun$resourceOffers$16$adapted(TaskSchedulerImpl.scala:574)
-	at scala.collection.mutable.ResizableArray.foreach(ResizableArray.scala:62)
-	at scala.collection.mutable.ResizableArray.foreach$(ResizableArray.scala:55)
-	at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:49)
-	at org.apache.spark.scheduler.TaskSchedulerImpl.resourceOffers(TaskSchedulerImpl.scala:574)
-	at org.apache.spark.scheduler.local.LocalEndpoint.reviveOffers(LocalSchedulerBackend.scala:91)
-	at org.apache.spark.scheduler.local.LocalEndpoint$$anonfun$receive$1.applyOrElse(LocalSchedulerBackend.scala:68)
-	at org.apache.spark.rpc.netty.Inbox.$anonfun$process$1(Inbox.scala:115)
-	at org.apache.spark.rpc.netty.Inbox.safelyCall(Inbox.scala:213)
-	at org.apache.spark.rpc.netty.Inbox.process(Inbox.scala:100)
-	at org.apache.spark.rpc.netty.MessageLoop.org$apache$spark$rpc$netty$MessageLoop$$receiveLoop(MessageLoop.scala:75)
-	at org.apache.spark.rpc.netty.MessageLoop$$anon$1.run(MessageLoop.scala:41)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
-	at java.base/java.lang.Thread.run(Thread.java:829)
-[Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 0) / 1]

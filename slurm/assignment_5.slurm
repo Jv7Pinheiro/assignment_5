@@ -2,7 +2,6 @@
 #SBATCH --job-name="PART3"
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=32
-#SBATCH --ntasks-per-node=32
 #SBATCH --mem=128GB
 #SBATCH --time=00-02:00:00
 #SBATCH --output="./Recommender_Spark-%j.o"
