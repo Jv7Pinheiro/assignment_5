@@ -5,3 +5,28 @@ NodeList  = cpu-intel-67
 Resources = cpu=32,mem=128G,node=1,billing=32
 WorkDir   = /deac/csc/classes/csc373/gonza224/assignment_5/slurm
 ###########################END-PROLOG#########################
+Loading and Appending Data time: 420.206532 seconds
+
+Data before cleaning: 7793069 entries.
+Data after cleaning: 7748577 entries.
+Cleaning time: 100.818907 seconds
+
+Traceback (most recent call last):
+  File "/deac/csc/classes/csc373/gonza224/assignment_5/scripts/assignment5_part3_recommendation.py", line 140, in <module>
+  File "/deac/csc/classes/csc373/gonza224/assignment_5/scripts/assignment5_part3_recommendation.py", line 53, in main
+    train_spark_df, dev_spark_df = spark_df.randomSplit([0.8, 0.2], seed=42)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/pandas/util/_decorators.py", line 333, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/pandas/core/generic.py", line 2702, in to_json
+    return json.to_json(
+           ^^^^^^^^^^^^^
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/pandas/io/json/_json.py", line 217, in to_json
+    with get_handle(
+         ^^^^^^^^^^^
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/pandas/io/common.py", line 749, in get_handle
+    check_parent_directory(str(handle))
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/pandas/io/common.py", line 616, in check_parent_directory
+    raise OSError(rf"Cannot save file into a non-existent directory: '{parent}'")
+OSError: Cannot save file into a non-existent directory: '../data'

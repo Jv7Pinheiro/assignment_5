@@ -1,0 +1,31 @@
+#########################BEGIN-PROLOG#########################
+JobName   = PART2
+Account   = csc373
+NodeList  = cpu-amd-04
+Resources = cpu=48,mem=200G,node=1,billing=48
+WorkDir   = /deac/csc/classes/csc373/deolj19/assignment_5/output
+###########################END-PROLOG#########################
+Starting
+
+Loading and Appending Data time: 255.057176 seconds
+
+Data before cleaning: 7793069 entries.
+Data after cleaning: 7748577 entries.
+Cleaning time: 69.175529 seconds
+
+Train labels discretizer transform time for 2 bins: 0.196663 seconds
+
+Dev labels discretizer transform time: 0.013871 seconds
+
+
+Performing Dummy Classifier (Random Guessing)
+	Dummy Classifier Accuracy: 50.1%
+
+Performing Multinomial Naive Bayes on the reviews
+	NB train time: 134.793756 seconds
+	NB predict time: 30.851543 seconds
+	Underpredictions: 385249 (24.859329064164015%)
+	Overpredictions:  201644 (13.01167439711534%)
+	NB Accuracy: 62.1%
+
+Performing Random Forest on the reviews

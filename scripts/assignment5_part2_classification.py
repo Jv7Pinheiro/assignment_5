@@ -1,14 +1,14 @@
-import sys, os, warnings
+import sys, warnings
 
 import gzip
 import time
-import pickle
+import joblib
 import numpy as np
-import pandas as pd
+
 
 from sklearn.pipeline import Pipeline # type: ignore
 from sklearn.naive_bayes import MultinomialNB # type: ignore
-from sklearn.ensemble import RandomForestClassifier  # type: ignore
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier  # type: ignore
 from sklearn.feature_extraction.text import TfidfVectorizer # type: ignore
 from sklearn.metrics import accuracy_score # type: ignore
 from sklearn.compose import ColumnTransformer # type: ignore
@@ -16,6 +16,8 @@ from sklearn.preprocessing import KBinsDiscretizer, FunctionTransformer, Standar
 
 import utils
 warnings.filterwarnings("ignore")
+
+sys.stdout.reconfigure(line_buffering=True)
 
 NUMBER_OF_BINS = 2
 
@@ -25,13 +27,13 @@ def compute_text_length(X):
 def complete_classifier():
     # Load File
     input_file = gzip.open("/deac/csc/classes/csc373/data/assignment_5/steam_reviews.json.gz")
-
+    print("Starting\n")
     # Append Data
     appending_time_start = time.time()
     dataset = []
     for i, l in enumerate(input_file):
-        if i > 1000:
-            break
+        # if i > 1000:
+        #     break
         d = eval(l)
         dataset.append(d)
     input_file.close()
@@ -87,6 +89,24 @@ def complete_classifier():
         ('early_access', 'passthrough', ['early_access'])
     ])
 
+    best_accuracy = -1
+    save_pipeline = None
+    best_model_name = "None"
+
+
+
+    ## Classifier Number 0 - Dummy classifier (random guess) %%
+    print("\nPerforming Dummy Classifier (Random Guessing)")
+
+    # Generate random predictions between 0 and (NUMBER_OF_BINS - 1)
+    dummy_dev_pred = np.random.randint(0, NUMBER_OF_BINS, size=len(dev_hours))
+
+    # Compute accuracy
+    dummy_accuracy = accuracy_score(dev_hours_binned, dummy_dev_pred)
+    print(f"\tDummy Classifier Accuracy: {100 * dummy_accuracy:.1f}%")
+
+
+
     ## Classifier Number 1 - Multinomial Naive Bayes ##
     print('\nPerforming Multinomial Naive Bayes on the reviews')
 
@@ -109,14 +129,18 @@ def complete_classifier():
     print(f"\tNB predict time: {dev_data_predict_time_end - dev_data_predict_time_start:.6f} seconds")
 
     # Under and Over predictions
-    underpred = np.sum(nb_dev_pred < dev_hours)
-    overpred = np.sum(nb_dev_pred > dev_hours)
-    print(f"\tUnderpredictions: {underpred} ({(underpred / len(dev_hours))*100}%)")
-    print(f"\tOverpredictions:  {overpred} ({(overpred / len(dev_hours))*100}%)")
+    underpred = np.sum(nb_dev_pred < dev_hours_binned)
+    overpred = np.sum(nb_dev_pred > dev_hours_binned)
+    print(f"\tUnderpredictions: {underpred} ({(underpred / len(dev_hours_binned))*100}%)")
+    print(f"\tOverpredictions:  {overpred} ({(overpred / len(dev_hours_binned))*100}%)")
 
     # Test Accuracy
     dev_accuracy = accuracy_score(dev_hours_binned, nb_dev_pred)
     print(f"\tNB Accuracy: {100*dev_accuracy:.1f}%")
+
+    if dev_accuracy > best_accuracy:
+        save_pipeline =  NB_pipeline
+        best_model_name = "NaiveBayes"
 
 
 
@@ -124,28 +148,102 @@ def complete_classifier():
     print('\nPerforming Random Forest on the reviews')
 
     # Create RF pipeline
-    class_pipeline = Pipeline([
+    RF_pipeline = Pipeline([
         ('features', feature_transformer),
-        ('classifier', RandomForestClassifier(n_estimators=100, random_state=42))  # Change to desired classifier
+        ('classifier', RandomForestClassifier(n_estimators=10, random_state=42))  # Change to desired classifier
     ])
 
     # Train Classifier
     RF_time_start = time.time()
-    class_pipeline.fit(train_data, train_hours_binned)
+    RF_pipeline.fit(train_data, train_hours_binned)
     RF_time_end = time.time()
     print(f"\tRF train time: {RF_time_end - RF_time_start:.6f} seconds")
 
     # Predict Developer Data
     dev_data_predict_time_start = time.time()
-    dev_preds = class_pipeline.predict(dev_data)
+    rf_dev_preds = RF_pipeline.predict(dev_data)
     dev_data_predict_time_end = time.time()
     print(f"\tRF predict time: {dev_data_predict_time_end - dev_data_predict_time_start:.6f} seconds")
 
+    # Under and Over predictions
+    underpred = np.sum(rf_dev_preds < dev_hours_binned)
+    overpred = np.sum(rf_dev_preds > dev_hours_binned)
+    print(f"\tUnderpredictions: {underpred} ({(underpred / len(dev_hours_binned))*100}%)")
+    print(f"\tOverpredictions:  {overpred} ({(overpred / len(dev_hours_binned))*100}%)")
 
-    dev_accuracy = accuracy_score(dev_hours_binned, dev_preds)
+    dev_accuracy = accuracy_score(dev_hours_binned, rf_dev_preds)
     print(f"\tRF Accuracy: {100 * dev_accuracy:.1f}%")
 
+    if dev_accuracy > best_accuracy:
+        save_pipeline =  RF_pipeline
+        best_model_name = "RandomForest"
 
+
+
+    ## Classifier Number 3 - Gradiant Boosting ##
+    print('\nPerforming Gradient Boosting on the reviews')
+
+    # Create the GB pipeline
+    GB_pipeline = Pipeline([
+        ('features', feature_transformer),
+        ('classifier', GradientBoostingClassifier(n_estimators=10, learning_rate=0.1, random_state=42))
+    ])
+
+    gbc_time_start = time.time()
+    GB_pipeline.fit(train_data, train_hours_binned)
+    gbc_time_end = time.time()
+    print(f"\tGBC train time: {gbc_time_end - gbc_time_start:.6f} seconds")
+
+    dev_data_predict_time_start = time.time()
+    gbc_dev_pred = GB_pipeline.predict(dev_data)
+    dev_data_predict_time_end = time.time()
+    print(f"\tGBC train time: {dev_data_predict_time_end - dev_data_predict_time_start:.6f} seconds")
+
+    # Under and Over predictions
+    underpred = np.sum(gbc_dev_pred < dev_hours_binned)
+    overpred = np.sum(gbc_dev_pred > dev_hours_binned)
+    print(f"\tUnderpredictions: {underpred} ({(underpred / len(dev_hours_binned))*100}%)")
+    print(f"\tOverpredictions:  {overpred} ({(overpred / len(dev_hours_binned))*100}%)")
+
+    dev_accuracy = accuracy_score(dev_hours_binned, gbc_dev_pred)
+    print(f"\tGBC Accuracy: {100 * dev_accuracy:.1f}%")
+
+    if dev_accuracy > best_accuracy:
+        save_pipeline =  GB_pipeline
+        best_model_name = "GradientBoosting"
+
+    joblib.dump(save_pipeline, f"../output/{best_model_name}_model.pkl")
+
+def classify_based_on_dates():
+    # Load File
+    input_file = gzip.open("/deac/csc/classes/csc373/data/assignment_5/steam_reviews.json.gz")
+
+    # Append Data
+    appending_time_start = time.time()
+    dataset = []
+    for i, l in enumerate(input_file):
+        # if i > 1000:
+        #     break
+        d = eval(l)
+        dataset.append(d)
+    input_file.close()
+    appending_time_end = time.time()
+    print(f"Loading and Appending Data time: {appending_time_end - appending_time_start:.6f} seconds\n")
+
+
+    # Clean Data
+    cleaning_time_start = time.time()
+    data = utils.clean_data(dataset, required_features=["hours", "early_access", "text"])
+    cleaning_time_end = time.time()
+    print(f"Cleaning time: {cleaning_time_end - cleaning_time_start:.6f} seconds\n")
+
+    # code to extract dates
+    dates = []
+    for i in range(len(data)):
+        dates.append(int(data[i]['date'][:4]))
+
+    print(dates[1:5])
+    
 if __name__ == "__main__":
     complete_classifier()
     # classify_based_on_dates()
