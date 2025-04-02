@@ -37,8 +37,8 @@ def main():
     appending_time_start = time.time()
     dataset = []
     for i, l in enumerate(input_file):
-        # if i > 1000:
-        #     break
+        if i > 1000:
+            break
         d = eval(l)
         dataset.append(d)
     input_file.close()
