@@ -23,3 +23,9 @@ Performing Dummy Classifier (Random Guessing)
 
 Performing Multinomial Naive Bayes on the reviews
 	NB train time: 257.722787 seconds
+	NB predict time: 58.940030 seconds
+	Underpredictions: 378587 (24.42944384648542%)
+	Overpredictions:  206629 (13.333346238923777%)
+	NB Accuracy: 62.2%
+
+Performing Random Forest on the reviews

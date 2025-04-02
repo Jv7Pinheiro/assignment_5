@@ -1,0 +1,41 @@
+#########################BEGIN-PROLOG#########################
+JobName   = PART2
+Account   = csc373
+NodeList  = cpu-intel-63
+Resources = cpu=32,mem=128G,node=1,billing=32
+WorkDir   = /deac/csc/classes/csc373/deolj19/assignment_5/output
+###########################END-PROLOG#########################
+Starting
+
+Loading and Appending Data time: 428.124549 seconds
+
+Data before cleaning: 7793069 entries.
+Data after cleaning: 7748577 entries.
+Cleaning time: 101.797424 seconds
+
+Traceback (most recent call last):
+  File "/deac/csc/classes/csc373/deolj19/assignment_5/scripts/assignment5_part2_classification.py", line 257, in <module>
+    complete_classifier()
+  File "/deac/csc/classes/csc373/deolj19/assignment_5/scripts/assignment5_part2_classification.py", line 78, in complete_classifier
+    train_hours_binned = discretizer.fit_transform(train_hours).ravel().astype(int)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/sklearn/utils/_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/sklearn/base.py", line 918, in fit_transform
+    return self.fit(X, **fit_params).transform(X)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/sklearn/base.py", line 1389, in wrapper
+    return fit_method(estimator, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/sklearn/preprocessing/_discretization.py", line 225, in fit
+    X = validate_data(self, X, dtype="numeric")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/sklearn/utils/validation.py", line 2944, in validate_data
+    out = check_array(X, input_name="X", **check_params)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/deac/csc/classes/csc373/software/csc373/lib/python3.11/site-packages/sklearn/utils/validation.py", line 1093, in check_array
+    raise ValueError(msg)
+ValueError: Expected 2D array, got 1D array instead:
+array=[ 0.1 51.1 14.6 ...  7.6 46.6  0.5].
+Reshape your data either using array.reshape(-1, 1) if your data has a single feature or array.reshape(1, -1) if it contains a single sample.
