@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=32
 #SBATCH --mem=128GB
 #SBATCH --time=00-02:00:00
-#SBATCH --output="./Classifier-Part2a-%j.o"
+#SBATCH --output="./Classifier-Part2b-%j.o"
 #SBATCH --mail-user=deolj19@wfu.edu
 #SBATCH --mail-type=FAIL
 #SBATCH --account=csc373

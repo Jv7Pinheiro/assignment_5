@@ -27,3 +27,10 @@ Performing Multinomial Naive Bayes on the reviews
 	Underpredictions: 478967 (30.906759690162584%)
 	Overpredictions:  159410 (10.286400863125888%)
 	NB Accuracy: 58.8%
+
+Performing Gradient Boosting on the reviews
+	GBC train time: 1537.423392 seconds
+	GBC train time: 58.601737 seconds
+	Underpredictions: 408071 (26.331985989691013%)
+	Overpredictions:  221629 (14.301265522198905%)
+	GBC Accuracy: 59.4%

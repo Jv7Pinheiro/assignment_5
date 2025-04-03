@@ -1,0 +1,34 @@
+#########################BEGIN-PROLOG#########################
+JobName   = PART2
+Account   = csc373
+NodeList  = cpu-intel-63
+Resources = cpu=32,mem=128G,node=1,billing=32
+WorkDir   = /deac/csc/classes/csc373/deolj19/assignment_5/output
+###########################END-PROLOG#########################
+Classifting based on hours
+
+
+Loading and Appending Data time: 420.815345 seconds
+
+Data before cleaning: 7793069 entries.
+Data after cleaning: 7748577 entries.
+Cleaning time: 101.912390 seconds
+
+Train labels discretizer transform time for 2 bins: 0.077724 seconds
+
+Dev labels discretizer transform time: 0.118353 seconds
+
+
+Training on < 2014, predicting on 2015 >
+	NB train time: 68.181080 seconds
+	NB predict time: 248.699306 seconds
+	Underpredictions: 1114257 (18.39887148793055%)
+	Overpredictions:  1040384 (17.17906328082223%)
+	NB Accuracy: 64.4%
+
+Training on 2015 >, predicting on < 2014
+	NB train time: 254.707818 seconds
+	NB predict time: 65.944347 seconds
+	Underpredictions: 287118 (16.964526804458124%)
+	Overpredictions:  299802 (17.713968002807746%)
+	NB Accuracy: 65.3%
